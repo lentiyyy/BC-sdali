@@ -79,7 +79,7 @@
 - В поле телефона использовать серый пример-подсказку `+7 999 123 45 67`, а не реальный контактный номер компании.
 - Поля `Имя` и `Телефон` обязательные.
 - Заявки отправляются через EmailJS на рабочую почту `sk.sdali@mail.ru`.
-- Текущие EmailJS-данные в `script.js`: `service_6hqxwvq`, `template_7d3chod`, public key `nymwpAcfo1oFJaYIO`.
+- Текущие EmailJS-данные в `script.js`: `service_6hqxwvq`, `template_7d3chod`, public key `nymwpAcfo1oFJaYlO`.
 - EmailJS Browser SDK сохранен локально в `assets/mail-client.min.js`; `script.js` подгружает его перед отправкой формы через `fetch` или `XMLHttpRequest`, чтобы форма не зависела от внешнего CDN или отдельного script-тега.
 - Если EmailJS не загрузился или сервис недоступен, форма должна показывать честную ошибку, а не фейковый успешный статус.
 - Удален абзац про подборку проектов, участок и вилку бюджета.

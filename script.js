@@ -209,7 +209,7 @@ const PHONE_NUMBER_RAW = "+79045112241";
 const EMAILJS_CONFIG = {
   serviceId: "service_6hqxwvq",
   templateId: "template_7d3chod",
-  publicKey: "nymwpAcfo1oFJaYIO",
+  publicKey: "nymwpAcfo1oFJaYlO",
 };
 const EMAILJS_SDK_URL = "assets/mail-client.min.js?v=4.4.1";
 let emailjsLoadPromise;
@@ -565,9 +565,13 @@ document.querySelector(".lead-form")?.addEventListener("submit", async (event) =
     button.innerHTML = "<span>Заявка отправлена</span>";
     setFormStatus(status, "Спасибо, заявка отправлена. Мы свяжемся с вами.", "success");
     form.reset();
-  } catch {
+  } catch (error) {
     button.innerHTML = initialText;
-    setFormStatus(status, "Не удалось отправить заявку. Попробуйте еще раз или позвоните нам.", "error");
+    const detail = error?.text || error?.message;
+    const message = detail
+      ? `Не удалось отправить заявку: ${detail}`
+      : "Не удалось отправить заявку. Попробуйте еще раз или позвоните нам.";
+    setFormStatus(status, message, "error");
   } finally {
     button.disabled = false;
   }
