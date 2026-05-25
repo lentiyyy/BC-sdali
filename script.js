@@ -181,6 +181,7 @@ const planImagesByHome = {
 };
 
 const getFileName = (path) => path.split("/").pop();
+const getThumbnailPath = (path) => `assets/gallery-thumbs/${path.replace(/\.[^.]+$/, ".jpg")}`;
 
 const sortImagesForGallery = (home) => {
   const exteriorOrder = new Map((exteriorImagesByHome[home.title] || []).map((fileName, index) => [fileName, index]));
@@ -351,7 +352,7 @@ const renderHomeCards = () => {
     .map(
       (home, index) => `
         <button class="home-card" type="button" data-home-index="${index}" aria-label="Открыть галерею ${home.title}">
-          <img src="${home.images[0]}" alt="${home.title}" loading="lazy" />
+          <img src="${getThumbnailPath(home.images[0])}" alt="${home.title}" loading="lazy" decoding="async" />
           <div class="home-card-content">
             <h3>${home.title}</h3>
             <p>${home.images.length} фото и планировки</p>
@@ -404,7 +405,7 @@ const renderGallery = () => {
     .map(
       (image, index) => `
         <button class="gallery-thumb${index === activeImageIndex ? " is-active" : ""}" type="button" data-gallery-thumb="${index}" aria-label="Показать фото ${index + 1}">
-          <img src="${image}" alt="${home.title}, миниатюра ${index + 1}" loading="lazy" />
+          <img src="${getThumbnailPath(image)}" alt="${home.title}, миниатюра ${index + 1}" loading="lazy" decoding="async" />
         </button>
       `
     )
