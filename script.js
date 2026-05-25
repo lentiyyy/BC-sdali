@@ -158,6 +158,7 @@ const exteriorImagesByHome = {
     "photo_2026-05-20 00.01.56.jpeg",
   ],
   "Ломоносовское подворье (рыжий)": [
+    "photo_2026-05-20 00.20.58.jpeg",
     "photo_2026-05-20 00.20.47 (1).jpeg",
     "photo_2026-05-20 00.20.47.jpeg",
     "photo_2026-05-20 00.20.48 (1).jpeg",
@@ -169,7 +170,6 @@ const exteriorImagesByHome = {
     "photo_2026-05-20 00.20.55.jpeg",
     "photo_2026-05-20 00.20.57 (1).jpeg",
     "photo_2026-05-20 00.20.57.jpeg",
-    "photo_2026-05-20 00.20.58.jpeg",
   ],
 };
 
@@ -204,6 +204,16 @@ const homes = rawHomes.map((home) => ({
   images: sortImagesForGallery(home),
 }));
 
+const PHONE_NUMBER_DISPLAY = "+7 904 511-22-41";
+const PHONE_NUMBER_RAW = "+79045112241";
+const EMAILJS_CONFIG = {
+  serviceId: "service_6hqxwvq",
+  templateId: "template_7d3chod",
+  publicKey: "nymwpAcfo1oFJaYIO",
+};
+const EMAILJS_SDK_URL = "assets/mail-client.min.js?v=4.4.1";
+let emailjsLoadPromise;
+
 if (window.lucide) {
   window.lucide.createIcons();
 }
@@ -225,6 +235,89 @@ const reveal = new IntersectionObserver(
 animatedItems.forEach((item, index) => {
   item.style.transitionDelay = `${Math.min(index * 55, 360)}ms`;
   reveal.observe(item);
+});
+
+const mobileMenu = document.querySelector("[data-mobile-menu]");
+const menuOpenButton = document.querySelector("[data-menu-open]");
+const menuCloseButtons = document.querySelectorAll("[data-menu-close]");
+const mobileMenuLinks = document.querySelectorAll(".mobile-nav a");
+
+const openMobileMenu = () => {
+  mobileMenu?.classList.add("is-open");
+  mobileMenu?.setAttribute("aria-hidden", "false");
+  menuOpenButton?.setAttribute("aria-expanded", "true");
+  document.body.classList.add("menu-open");
+};
+
+const closeMobileMenu = () => {
+  mobileMenu?.classList.remove("is-open");
+  mobileMenu?.setAttribute("aria-hidden", "true");
+  menuOpenButton?.setAttribute("aria-expanded", "false");
+  document.body.classList.remove("menu-open");
+};
+
+menuOpenButton?.addEventListener("click", openMobileMenu);
+menuCloseButtons.forEach((button) => button.addEventListener("click", closeMobileMenu));
+mobileMenuLinks.forEach((link) => link.addEventListener("click", closeMobileMenu));
+
+const headerCallButton = document.querySelector(".header-cta");
+const callModal = document.querySelector("[data-call-modal]");
+const callCloseButtons = document.querySelectorAll("[data-call-close]");
+const copyPhoneButton = document.querySelector("[data-copy-phone]");
+const copyStatus = document.querySelector("[data-copy-status]");
+
+const isDesktopCallMode = () =>
+  window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
+  window.matchMedia("(min-width: 961px)").matches;
+
+const openCallModal = () => {
+  if (!callModal) return;
+
+  callModal.classList.add("is-open");
+  callModal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("call-open");
+  if (copyStatus) copyStatus.textContent = "";
+};
+
+const closeCallModal = () => {
+  callModal?.classList.remove("is-open");
+  callModal?.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("call-open");
+};
+
+const copyText = async (text) => {
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const field = document.createElement("textarea");
+  field.value = text;
+  field.setAttribute("readonly", "");
+  field.style.position = "fixed";
+  field.style.opacity = "0";
+  document.body.append(field);
+  field.select();
+  document.execCommand("copy");
+  field.remove();
+};
+
+headerCallButton?.addEventListener("click", (event) => {
+  if (!isDesktopCallMode()) return;
+
+  event.preventDefault();
+  openCallModal();
+});
+
+callCloseButtons.forEach((button) => button.addEventListener("click", closeCallModal));
+
+copyPhoneButton?.addEventListener("click", async () => {
+  try {
+    await copyText(PHONE_NUMBER_RAW);
+    copyStatus.textContent = "Номер скопирован";
+  } catch {
+    copyStatus.textContent = PHONE_NUMBER_DISPLAY;
+  }
 });
 
 const slider = document.querySelector("[data-home-slider]");
@@ -362,6 +455,11 @@ document.querySelectorAll("[data-gallery-close]").forEach((button) => {
 });
 
 document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeMobileMenu();
+    closeCallModal();
+  }
+
   if (!galleryModal?.classList.contains("is-open")) return;
 
   if (event.key === "Escape") closeGallery();
@@ -371,16 +469,106 @@ document.addEventListener("keydown", (event) => {
 
 renderHomeCards();
 
-document.querySelector(".lead-form")?.addEventListener("submit", (event) => {
+const isEmailjsConfigured = () =>
+  Object.values(EMAILJS_CONFIG).every((value) => value && !["SERVICE_ID", "TEMPLATE_ID", "PUBLIC_KEY"].includes(value));
+
+const loadTextFile = (url) => {
+  if (window.fetch) {
+    return fetch(url).then((response) => {
+      if (!response.ok) throw new Error("File load failed");
+      return response.text();
+    });
+  }
+
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    request.open("GET", url, true);
+    request.addEventListener("load", () => {
+      if (request.status >= 200 && request.status < 300) {
+        resolve(request.responseText);
+        return;
+      }
+
+      reject(new Error("File load failed"));
+    });
+    request.addEventListener("error", () => reject(new Error("File load failed")));
+    request.send();
+  });
+};
+
+const loadEmailjs = async () => {
+  if (window.emailjs) return window.emailjs;
+
+  emailjsLoadPromise ||= loadTextFile(EMAILJS_SDK_URL)
+    .then((source) => {
+      const emailjsClient = new Function(`${source}; return emailjs;`)();
+      window.emailjs = emailjsClient;
+      return emailjsClient;
+    });
+
+  return emailjsLoadPromise;
+};
+
+const setFormStatus = (element, message, type = "") => {
+  if (!element) return;
+
+  element.textContent = message;
+  element.classList.toggle("is-success", type === "success");
+  element.classList.toggle("is-error", type === "error");
+};
+
+document.querySelector(".lead-form")?.addEventListener("submit", async (event) => {
   event.preventDefault();
-  const button = event.currentTarget.querySelector("button");
-  const initialText = button.innerHTML;
+  const form = event.currentTarget;
+  const button = form.querySelector("button");
+  const status = form.querySelector("[data-form-status]");
+  const initialText = button.dataset.initialHtml || button.innerHTML;
+  button.dataset.initialHtml = initialText;
 
-  button.innerHTML = "<span>Заявка отправлена</span>";
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    return;
+  }
+
+  form.querySelector("[data-page-url]").value = window.location.href;
+  form.querySelector("[data-submitted-at]").value = new Date().toLocaleString("ru-RU", {
+    timeZone: "Europe/Moscow",
+  });
+
+  button.innerHTML = "<span>Отправляем...</span>";
   button.disabled = true;
+  setFormStatus(status, "");
 
-  window.setTimeout(() => {
+  if (!isEmailjsConfigured()) {
     button.innerHTML = initialText;
     button.disabled = false;
-  }, 2400);
+    setFormStatus(status, "EmailJS еще не настроен: добавьте SERVICE_ID, TEMPLATE_ID и PUBLIC_KEY.", "error");
+    return;
+  }
+
+  let emailjsClient;
+
+  try {
+    emailjsClient = await loadEmailjs();
+  } catch {
+    button.innerHTML = initialText;
+    button.disabled = false;
+    setFormStatus(status, "Не удалось загрузить EmailJS. Проверьте подключение к интернету и попробуйте еще раз.", "error");
+    return;
+  }
+
+  try {
+    await emailjsClient.sendForm(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, form, {
+      publicKey: EMAILJS_CONFIG.publicKey,
+    });
+
+    button.innerHTML = "<span>Заявка отправлена</span>";
+    setFormStatus(status, "Спасибо, заявка отправлена. Мы свяжемся с вами.", "success");
+    form.reset();
+  } catch {
+    button.innerHTML = initialText;
+    setFormStatus(status, "Не удалось отправить заявку. Попробуйте еще раз или позвоните нам.", "error");
+  } finally {
+    button.disabled = false;
+  }
 });

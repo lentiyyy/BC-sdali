@@ -14,13 +14,14 @@
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=slider-gallery-6" />
+    <link rel="icon" href="assets/logo-sdali-main.png?v=main-logo-1" type="image/png" />
+    <link rel="stylesheet" href="styles.css?v=main-logo-1" />
   </head>
   <body>
     <header class="site-header" data-animate>
       <a class="brand" href="#top" aria-label="СК СДАЛИ">
-        <span class="brand-mark">СД</span>
-        <span>
+        <img class="brand-symbol" src="assets/logo-sdali-main.png?v=main-logo-1" alt="" aria-hidden="true" />
+        <span class="brand-copy">
           <strong>СК СДАЛИ</strong>
           <small>строительная компания</small>
         </span>
@@ -31,18 +32,41 @@
         <a href="#price">Стоимость</a>
         <a href="#contacts">Контакты</a>
       </nav>
+      <button class="menu-toggle" type="button" data-menu-open aria-label="Открыть меню" aria-controls="mobile-menu" aria-expanded="false">
+        <i data-lucide="menu"></i>
+        <span class="menu-toggle-lines" aria-hidden="true"></span>
+      </button>
       <a class="header-cta" href="tel:+79045112241">
         <i data-lucide="phone"></i>
+        <span class="phone-fallback" aria-hidden="true">☎</span>
         <span>Позвонить</span>
       </a>
     </header>
+
+    <div class="mobile-menu" id="mobile-menu" data-mobile-menu aria-hidden="true">
+      <button class="mobile-menu-backdrop" type="button" data-menu-close aria-label="Закрыть меню"></button>
+      <section class="mobile-menu-panel" aria-label="Мобильная навигация">
+        <div class="mobile-menu-head">
+          <span>Меню</span>
+          <button class="icon-button" type="button" data-menu-close aria-label="Закрыть меню">
+            <i data-lucide="x"></i>
+            <span class="close-mark" aria-hidden="true"></span>
+          </button>
+        </div>
+        <nav class="mobile-nav" aria-label="Мобильная навигация">
+          <a href="#benefits">Преимущества</a>
+          <a href="#projects">Готовые дома</a>
+          <a href="#price">Стоимость</a>
+          <a href="#contacts">Контакты</a>
+        </nav>
+      </section>
+    </div>
 
     <main id="top">
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-backdrop" role="img" aria-label="Современный загородный дом среди деревьев"></div>
         <div class="hero-overlay"></div>
         <div class="hero-content">
-          <p class="eyebrow" data-animate>Строительство и продажа загородных домов</p>
           <h1 id="hero-title" data-animate>СК СДАЛИ строит дома, в которые хочется переехать</h1>
           <p class="hero-copy" data-animate>
             Продаем качественные готовые загородные дома для постоянной жизни и отдыха. Каждый дом
@@ -93,7 +117,6 @@
 
       <section class="section benefits" id="benefits">
         <div class="section-heading" data-animate>
-          <p class="eyebrow">Почему выбирают нас</p>
           <h2>СДАЛИ отвечает за результат от первой встречи до ключей</h2>
         </div>
         <div class="benefit-grid">
@@ -143,11 +166,11 @@
           <form class="lead-form" aria-label="Форма заявки">
             <label>
               <span>Имя</span>
-              <input type="text" name="name" placeholder="Как к вам обращаться" autocomplete="name" />
+              <input type="text" name="name" placeholder="Как к вам обращаться" autocomplete="name" required />
             </label>
             <label>
               <span>Телефон</span>
-              <input type="tel" name="phone" placeholder="+7 904 511-22-41" autocomplete="tel" />
+              <input type="tel" name="phone" placeholder="+7 999 123 45 67" autocomplete="tel" required />
             </label>
             <label>
               <span>Площадь дома</span>
@@ -157,10 +180,13 @@
                 <option>180-250 м²</option>
               </select>
             </label>
+            <input type="hidden" name="page_url" value="" data-page-url />
+            <input type="hidden" name="submitted_at" value="" data-submitted-at />
             <button class="btn btn-dark" type="submit">
               <span>Отправить заявку</span>
               <i data-lucide="send"></i>
             </button>
+            <p class="form-status" data-form-status aria-live="polite"></p>
           </form>
         </div>
       </section>
@@ -191,14 +217,28 @@
       </section>
     </div>
 
+    <div class="call-modal" data-call-modal aria-hidden="true">
+      <button class="call-modal-backdrop" type="button" data-call-close aria-label="Закрыть окно с телефоном"></button>
+      <section class="call-dialog" role="dialog" aria-modal="true" aria-labelledby="call-title">
+        <button class="gallery-close" type="button" data-call-close aria-label="Закрыть окно">
+          <i data-lucide="x"></i>
+          <span class="close-mark" aria-hidden="true"></span>
+        </button>
+        <p class="eyebrow">Контактный телефон</p>
+        <h2 id="call-title">Позвоните в СК СДАЛИ</h2>
+        <div class="call-number" data-call-number>+7 904 511-22-41</div>
+        <button class="btn btn-primary" type="button" data-copy-phone>
+          <span>Скопировать номер</span>
+          <i data-lucide="copy"></i>
+        </button>
+        <p class="copy-status" data-copy-status aria-live="polite"></p>
+      </section>
+    </div>
+
     <footer class="footer" id="contacts">
       <div>
         <a class="brand footer-brand" href="#top" aria-label="СК СДАЛИ">
-          <span class="brand-mark">СД</span>
-          <span>
-            <strong>СК СДАЛИ</strong>
-            <small>загородные дома под ключ</small>
-          </span>
+          <img class="footer-logo" src="assets/logo-sdali-main-footer.png?v=main-logo-1" alt="СК СДАЛИ" />
         </a>
         <p>Строим современные загородные дома для постоянной жизни, отдыха и инвестиций.</p>
       </div>
@@ -218,6 +258,6 @@
     </footer>
 
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-    <script src="script.js?v=slider-gallery-6"></script>
+    <script src="script.js?v=site-interactions-2"></script>
   </body>
 </html>
