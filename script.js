@@ -180,8 +180,12 @@ const planImagesByHome = {
   "Ломоносовское подворье (рыжий)": ["photo_2026-05-20 00.21.58.jpeg"],
 };
 
+const PRODUCTION_ASSET_ORIGIN = "https://bc-sdali.vercel.app/";
+const USE_PRODUCTION_ASSET_ORIGIN = ["sk-sdali.ru", "www.sk-sdali.ru"].includes(window.location.hostname);
+
 const getFileName = (path) => path.split("/").pop();
-const getThumbnailPath = (path) => `assets/gallery-thumbs/${path.replace(/\.[^.]+$/, ".jpg")}`;
+const getAssetPath = (path) => (USE_PRODUCTION_ASSET_ORIGIN ? new URL(path, PRODUCTION_ASSET_ORIGIN).href : path);
+const getThumbnailPath = (path) => getAssetPath(`assets/gallery-thumbs/${path.replace(/\.[^.]+$/, ".jpg")}`);
 
 const sortImagesForGallery = (home) => {
   const exteriorOrder = new Map((exteriorImagesByHome[home.title] || []).map((fileName, index) => [fileName, index]));
@@ -396,7 +400,7 @@ const renderGallery = () => {
   const home = homes[activeHomeIndex];
   const activeImage = home.images[activeImageIndex];
 
-  galleryImage.src = activeImage;
+  galleryImage.src = getAssetPath(activeImage);
   galleryImage.alt = `${home.title}, фото ${activeImageIndex + 1}`;
   galleryTitle.textContent = home.title;
   galleryCounter.textContent = `${activeImageIndex + 1} из ${home.images.length}`;
